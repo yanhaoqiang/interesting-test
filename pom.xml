@@ -7,11 +7,48 @@
     <name>Archetype - interesing-test</name>
     <url>http://maven.apache.org</url>
 
+    <properties>
+        <jmh.version>1.37</jmh.version>
+        <jdk.version>17</jdk.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <lombok.version>1.18.28</lombok.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <version>3.1.8</version>
         </dependency>
+
+
+        <!--jmh 基准测试 -->
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>${jmh.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>${jmh.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- maven编译工具 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
