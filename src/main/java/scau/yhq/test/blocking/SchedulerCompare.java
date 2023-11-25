@@ -1,9 +1,6 @@
 package scau.yhq.test.blocking;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -11,14 +8,11 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
-import java.sql.Time;
-import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class CompareInsertToBlockingQueueWithMe {
+public class SchedulerCompare {
 
     public static final int MAX_SIZE = 2 << 25;
 
@@ -33,6 +27,8 @@ public class CompareInsertToBlockingQueueWithMe {
 
     private static Scheduler<Integer> scheduler = new Scheduler<>();
 
+    private static SchedulerV2<Integer> schedulerv2 = new SchedulerV2<>();
+
 
     @Benchmark
     @Threads(THREAD_COUNT)
@@ -44,6 +40,18 @@ public class CompareInsertToBlockingQueueWithMe {
         scheduler.addObject(1);
 
     }
+
+    @Benchmark
+    @Threads(THREAD_COUNT)
+    public void testSchedulerV2() {
+//        for (int i = 0; i < INSERT_PER_TIME; i++) {
+//            scheduler.addObject(1);
+//        }
+
+        schedulerv2.addObject(1);
+
+    }
+
 
     @Benchmark
     @Threads(THREAD_COUNT)
@@ -109,7 +117,7 @@ public class CompareInsertToBlockingQueueWithMe {
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(CompareInsertToBlockingQueueWithMe.class.getSimpleName())
+                .include(SchedulerCompare.class.getSimpleName())
                 .measurementIterations(3)
                 .measurementTime(TimeValue.seconds(5))
                 .timeUnit(TimeUnit.SECONDS)

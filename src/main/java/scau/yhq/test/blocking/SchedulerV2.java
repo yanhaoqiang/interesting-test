@@ -1,15 +1,13 @@
 package scau.yhq.test.blocking;
 
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 审计日记调度器
@@ -19,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * </p>
  */
 //@Slf4j
-public class Scheduler<T> {
+public class SchedulerV2<T> {
 
     private static final String PREFIX_LOG = "审计日志调度器 - ";
 
@@ -50,7 +48,7 @@ public class Scheduler<T> {
     /**
      * 审计日志插入到{@code BASE_SET}的锁， COW适用于读多写少的场景
      */
-    private final Object addLock = new Object();
+    private final ReentrantLock addLock = new ReentrantLock();
 
     /**
      * 是否正在调度
@@ -58,6 +56,8 @@ public class Scheduler<T> {
     private volatile boolean scheduling = false;
 
     private final Object schedulingLock = new Object();
+
+
 
     /**
      * 添加审计日志
@@ -77,12 +77,15 @@ public class Scheduler<T> {
 //            }
 //        });
 
-        synchronized (addLock) {
+        try {
+            addLock.lock();
             // 大费周章就只为插入到List，但如果不另外开一个线程池去搞，理论上来说，所有线程在此刻都被我搞成串行的了。
             baseList.add(object);
             if (baseList.size() > (INITIAL_SIZE_OF_SET >> 1)) {
                 baseList.clear();
             }
+        } finally {
+            addLock.unlock();
         }
 
         // 如果有审计进来，就去开启一个线程去实现插入数据库逻辑（多次调用保证只会启动一个线程，保证幂等性）
@@ -132,10 +135,13 @@ public class Scheduler<T> {
         if (!baseList.isEmpty()) {
             // 再清理一下，预防不可知的操作
             insertList.clear();
-            synchronized (addLock) {
+            try {
+                addLock.lock();
                 // 数据从准备队列迁移到插入队列
                 insertList.addAll(baseList);
                 baseList.clear();
+            } finally {
+                addLock.unlock();
             }
             // todo 插入数据库
 
