@@ -18,7 +18,7 @@ public class SchedulerCompare {
 
     public static final long INSERT_PER_TIME = 2 << 10;
 
-    public static final int THREAD_COUNT = 16;
+    public static final int THREAD_COUNT = 32;
 
 
     private static ArrayBlockingQueue<Integer> blockingQueue = new ArrayBlockingQueue<>(MAX_SIZE);
@@ -30,8 +30,8 @@ public class SchedulerCompare {
     private static SchedulerV2<Integer> schedulerv2 = new SchedulerV2<>();
 
 
-    @Benchmark
-    @Threads(THREAD_COUNT)
+//    @Benchmark
+//    @Threads(THREAD_COUNT)
     public void testScheduler() {
 //        for (int i = 0; i < INSERT_PER_TIME; i++) {
 //            scheduler.addObject(1);
@@ -41,8 +41,8 @@ public class SchedulerCompare {
 
     }
 
-    @Benchmark
-    @Threads(THREAD_COUNT)
+//    @Benchmark
+//    @Threads(THREAD_COUNT)
     public void testSchedulerV2() {
 //        for (int i = 0; i < INSERT_PER_TIME; i++) {
 //            scheduler.addObject(1);
@@ -67,12 +67,15 @@ public class SchedulerCompare {
 //            }
 //        }
         blockingQueue.add(1);
+//        if (blockingQueue.size() > (MAX_SIZE >> 1)) {
+//            synchronized (blockingQueue) {
+//                if (blockingQueue.size() > (MAX_SIZE >> 1)) {
+//                    blockingQueue.clear();
+//                }
+//            }
+//        }
         if (blockingQueue.size() > (MAX_SIZE >> 1)) {
-            synchronized (blockingQueue) {
-                if (blockingQueue.size() > (MAX_SIZE >> 1)) {
-                    blockingQueue.clear();
-                }
-            }
+            blockingQueue.clear();
         }
 //        if (blockingQueue.size() > (MAX_SIZE >> 5)) {
 //            synchronized (blockingQueue) {
@@ -83,8 +86,8 @@ public class SchedulerCompare {
 //        }
     }
 
-    @Benchmark
-    @Threads(THREAD_COUNT)
+//    @Benchmark
+//    @Threads(THREAD_COUNT)
 //    @Measurement()
     public void testLinkedBlockingQueue() {
 //        for (int i = 0; i < INSERT_PER_TIME; i++) {
@@ -123,7 +126,9 @@ public class SchedulerCompare {
                 .timeUnit(TimeUnit.SECONDS)
                 .warmupIterations(3)
                 .warmupTime(TimeValue.seconds(5))
+                .forks(3)
                 .build();
         new Runner(opt).run();
     }
 }
+ 

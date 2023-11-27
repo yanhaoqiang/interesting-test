@@ -71,9 +71,15 @@ public class SchedulerV2<T> {
 
         // 插入调度集合
 //        pool.execute(() -> {
-//            synchronized (addLock) {
+//            try {
+//                addLock.lock();
 //                // 大费周章就只为插入到List，但如果不另外开一个线程池去搞，理论上来说，所有线程在此刻都被我搞成串行的了。
 //                baseList.add(object);
+//                if (baseList.size() > (INITIAL_SIZE_OF_SET >> 1)) {
+//                    baseList.clear();
+//                }
+//            } finally {
+//                addLock.unlock();
 //            }
 //        });
 
