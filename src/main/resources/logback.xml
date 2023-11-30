@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds">
     <!-- 需要修改的 -->
-    <property name="clickhouse-test" value="file"/>
+    <property name="service_name" value="clickhouse-test"/>
 
     <property name="log_charset" value="UTF-8"/>
     <!-- %d{}=时间 %C=文件全类名 %t=线程标识 %-5p左对齐5格，且输出日志级别 %m输出信息 %n换行 -->

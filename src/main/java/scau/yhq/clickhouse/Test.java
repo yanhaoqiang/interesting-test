@@ -3,9 +3,11 @@ package scau.yhq.clickhouse;
 import com.clickhouse.client.*;
 import com.clickhouse.data.ClickHouseFormat;
 import com.clickhouse.data.ClickHouseRecord;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ExecutionException;
 
+@Slf4j
 public class Test {
 
     static int query(ClickHouseNode server, String table) throws ClickHouseException {
@@ -36,13 +38,15 @@ public class Test {
                 // .port(ClickHouseProtocol.GRPC, Integer.getInteger("chPort", 9100))
                 // .port(ClickHouseProtocol.TCP, Integer.getInteger("chPort", 9000))
                 .database("default").credentials(ClickHouseCredentials.fromUserAndPassword(
-                        System.getProperty("chUser", "default"), System.getProperty("chPassword", "Y1bMm7N#Zq")))
+                        System.getProperty("chUser", "root"), System.getProperty("chPassword", "Y1bMm7N#Zq")))
                 .build();
 
-        String table = "select * from domain";
+        String table = "domain";
 
         try {
+            long start = System.currentTimeMillis();
             System.out.println("Query: " + query(server, table));
+            log.info("time:{}", System.currentTimeMillis() - start);
         } catch (ClickHouseException e) {
             e.printStackTrace();
         }
